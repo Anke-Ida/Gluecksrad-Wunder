@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Coaching Glücksrad</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.23.5/babel.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.js"></script>
+    <style>
+        .wheel-container {
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .wheel {
+            position: relative;
+            width: 400px;
+            height: 400px;
+            margin: 0 auto;
+        }
+        .spinner {
+            transition: transform 3s cubic-bezier(0.2, 0.8, 0.2, 1);
+        }
+    </style>
+</head>
+<body>
+    <div id="root"></div>
+    <script type="text/babel">
+        const questions = [
+            "Stell dir vor, du öffnest die Augen und der Konflikt, der dich so lange begleitet hat, ist auf wunderbare Weise gelöst – wie fühlt sich das an?",
+            "Spüre die neue Energie, die durch die Lösung des Konflikts frei wird, und erkenne, dass sie dich zu etwas Größerem, Sinnvollerem führt.",
+            "Was ist das erste, was du tust, wenn du merkst, dass dein Handeln jetzt von Freude und Sinn getragen wird?",
+            "Spüre, wie du im Flow versinkst, während du dich in Tätigkeiten verlierst, die dich vollkommen im Moment aufgehen lassen.",
+            "Erlaube dir, diese neue kreative Spannung zu genießen, die dich dazu antreibt, deine Visionen ohne Druck und Konflikte zu verfolgen.",
+            "Nimm wahr, wie die Menschen um dich herum dich unterstützen, und wie eure Verbindungen dich in diesem neuen, konfliktfreien Leben stärken.",
+            "Was macht es für einen Sinn, dass dein Konflikt jetzt gelöst ist, und welchen Raum möchtest du in dieser neu gewonnenen Freiheit gestalten?"
+        ];
+
+        function WheelOfQuestions() {
+            const [rotation, setRotation] = React.useState(0);
+            const [isSpinning, setIsSpinning] = React.useState(false);
+            const [selectedQuestion, setSelectedQuestion] = React.useState('');
+
+            const spinWheel = () => {
+                if (!isSpinning) {
+                    setIsSpinning(true);
+                    const spins = 5;
+                    const extraDegrees = Math.random() * 360;
+                    const totalDegrees = spins * 360 + extraDegrees;
+                    setRotation(rotation + totalDegrees);
+                    
+                    setTimeout(() => {
+                        const normalizedDegree = extraDegrees % 360;
+                        const questionIndex = Math.floor(normalizedDegree / (360 / questions.length));
+                        setSelectedQuestion(questions[questionIndex]);
+                        setIsSpinning(false);
+                    }, 3000);
+                }
+            };
+
+            return (
+                <div className="wheel-container">
+                    <div className="wheel">
+                        <div
+                            className="spinner absolute w-full h-full rounded-full border-4 border-gray-200"
+                            style={{
+                                transform: `rotate(${rotation}deg)`,
+                            }}
+                        >
+                            {questions.map((_, index) => {
+                                const rotation = (360 / questions.length) * index;
+                                const color = `hsl(${(360 / questions.length) * index}, 70%, 60%)`;
+                                return (
+                                    <div
+                                        key={index}
+                                        className="absolute w-full h-full"
+                                        style={{
+                                            transform: `rotate(${rotation}deg)`,
+                                            transformOrigin: '50% 50%',
+                                            clipPath: `polygon(50% 50%, 50% 0%, ${50 + 50 * Math.cos((2 * Math.PI * (index + 1)) / questions.length)}% ${50 - 50 * Math.sin((2 * Math.PI * (index + 1)) / questions.length)}%)`
+                                        }}
+                                    >
+                                        <div
+                                            className="w-full h-full"
+                                            style={{ backgroundColor: color }}
+                                        />
+                                    </div>
+                                );
+                            })}
+                        </div>
+                        <div className="absolute top-0 left-1/2 transform -translate-x-1/2 -translate-y-4 w-0 h-0 border-l-8 border-r-8 border-b-16 border-transparent border-b-black" />
+                    </div>
+                    
+                    <button
+                        onClick={spinWheel}
+                        disabled={isSpinning}
+                        className="mt-8 px-6 py-3 bg-blue-600 text-white rounded-lg shadow hover:bg-blue-700 transition-colors disabled:bg-gray-400 block mx-auto"
+                    >
+                        {isSpinning ? 'Dreht sich...' : 'Drehen'}
+                    </button>
+
+                    {selectedQuestion && (
+                        <div className="mt-8 p-6 bg-white rounded-lg shadow-lg">
+                            <p className="text-lg text-center text-gray-800">{selectedQuestion}</p>
+                        </div>
+                    )}
+                </div>
+            );
+        }
+
+        ReactDOM.render(<WheelOfQuestions />, document.getElementById('root'));
+    </script>
+</body>
+</html>
